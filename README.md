@@ -9,6 +9,8 @@ matplotlib and seaborn for Python
 Simply fire up RStudio for trying out your R code, or Spyder for your Python code.
 
 ## Getting help
+To seek help please email xyz@gmail.com or create an issue on github.
+
 ## Contributors
 Contributions and references are included in the source code files.
 
@@ -19,3 +21,4 @@ Let’s also open the scriptlets.R file. You’ll notice we have some template t
 
 ## Licensing
 This is all available as CC BY 4.0 license. Enjoy!
+
