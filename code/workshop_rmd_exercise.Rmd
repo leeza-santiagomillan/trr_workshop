@@ -1,0 +1,101 @@
+---
+title: "Exercise #4"
+author: "Leeza M Santiago Millán"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 1
+---
+
+# **Set-up libraries and data**
+
+## Load libraries
+```{r load_libraries, message=FALSE}
+library(tidyverse)
+library(pheatmap)
+```
+
+## Load data
+```{r load_data}
+load("data/Rmarkdown_data.Rdata")
+```
+
+# **Top 20 significant genes**
+
+## Get names of top 20 significant genes
+```{r gene_names}
+top20_sigOE_genes <- res_tableOE_tb %>% 
+  arrange(padj) %>% 	#Arrange rows by padj values
+  pull(gene) %>% 		#Extract character vector of ordered genes
+  head(n=20)	
+```
+
+## Normalize counts for top 20 significant genes
+```{r normalize_counts}
+top20_sigOE_norm <- normalized_counts %>%
+  filter(gene %in% top20_sigOE_genes)
+```
+
+## Gather the columns to have normalized counts to a single column
+```{r gather_as_column}
+gathered_top20_sigOE <- top20_sigOE_norm %>%
+  gather(colnames(top20_sigOE_norm)[2:9], key = "samplename", value = "normalized_counts")
+gathered_top20_sigOE <- inner_join(mov10_meta, gathered_top20_sigOE)
+```
+
+## Plot using ggplot2
+```{r plot}
+ggplot(gathered_top20_sigOE) +
+  geom_point(aes(x = gene, y = normalized_counts, color = sampletype)) +
+  scale_y_log10() +
+  xlab("Genes") +
+  ylab("log10 Normalized Counts") +
+  ggtitle("Top 20 Significant DE Genes") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+Figure 1. Normalized counts for top twenty significant genes in control (orange), knockdown (green), and overexppressed (blue) backgrounds.
+
+# **Create a heatmap of the differentially expressed genes**
+
+## Extract normalized expression for significant genes from the OE and control samples (2:4 and 7:9)
+```{r extract_significantgenes}
+res_tableOE_tb_sig <- res_tableOE_tb %>%
+  filter(padj < 0.05)
+```
+
+## Return the normalized counts for the significant DE genes
+```{r normalizedcount_DEgenes}
+norm_OEsig <- normalized_counts %>% 
+  filter(gene %in% res_tableOE_tb_sig$gene) 
+
+meta <- mov10_meta %>%
+column_to_rownames("samplename") %>%
+data.frame()
+```
+
+## Run pheatmap using the metadata data frame for the annotation
+```{r heatmap}
+pheatmap(norm_OEsig[2:9], 
+         cluster_rows = T, 
+         show_rownames = F,
+         annotation = meta, 
+         border_color = NA, 
+         fontsize = 10, 
+         scale = "row", 
+         fontsize_row = 10, 
+         height = 20)
+```
+
+Figure 2. Comparison of normalized expression of the top twenty significant genes in control, knockdown, and overexppressed backgrounds by heatmap.
+
+
+# **Session info**
+```{r session_info}
+sessionInfo()
+```
