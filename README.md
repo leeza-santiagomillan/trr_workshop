@@ -1,3 +1,6 @@
+# gitkraken nanocourse
+This is the repo we are using to learn Git
+
 # Overview
 Our code will demonstrate the different code snippets that have been used for prograclasses. We will have this written in both R and Python.
 
